@@ -12,5 +12,6 @@ libs:
 
 tags:
   - c
+  - docs:misc:Empty
 
 manifest_version: 2017-09-29
