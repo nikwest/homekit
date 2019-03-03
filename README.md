@@ -1,7 +1,11 @@
-# A blank Mongoose OS library
+# Mongoose library to integrate with Apple HomeKit
 
 
 ## Overview
 
-This blank library is intended to be used as a skeleton for deleloping
-Mongoose OS libraries.
+This is a port from younghyunjo/esp32-homekit to Mongoose OS.
+
+Current status:
+
+- refactored code into Mongoose library
+- compiles for esp32

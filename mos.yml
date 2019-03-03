@@ -1,17 +1,88 @@
-author: mongoose-os
+author: nikwest
 type: lib
-description: An empty lib that does nothing
+description: Homekit integration for Mongoose OS
 version: 1.0
+platforms: [esp32]
 
 sources:
   - src
+  - wolfssl/src
+  - wolfssl/wolfcrypt/src
+
+includes:
+  - include
+  - wolfssl
+
+cflags:
+  - "-fstrict-volatile-bitfields"
+  - "-ffunction-sections"
+  - "-fdata-sections"
+  - "-mlongcalls"
+  - "-nostdlib"
+  - "-ggdb"
+  - "-Os"
+  - "-DNDEBUG"
+  - "-std=gnu99"
+  - "-Wno-old-style-declaration"
+  - "-Wno-error"
+  - "-Wno-error=pointer-sign"
+  - "-Wno-error=format"
+  - "-Wno-error=implicit-function-declaration"
+
+cdefs:
+  SIZEOF_LONG_LONG: 8
+  SMALL_SESSION_CACHE: 1
+  WOLFSSL_SMALL_STACK: 1
+  WOLFCRYPT_HAVE_SRP: 1
+  WOLFSSL_SHA512: 1
+  HAVE_CHACHA: 1
+  HAVE_HKDF: 1
+  HAVE_ONE_TIME_AUTH: 1
+  HAVE_ED25519: 1
+  HAVE_ED25519_KEY_EXPORT: 1
+  HAVE_ED25519_KEY_IMPORT: 1
+  HAVE_OCSP: 1
+  HAVE_CURVE25519: 1
+  HAVE_POLY1305: 1
+  HAVE_SNI: 1
+  HAVE_TLS_EXTENSIONS: 1
+  TIME_OVERRIDES: 1
+  NO_DES: 1
+  NO_DES3: 1
+  NO_DSA: 1
+  NO_ERROR_STRINGS: 1
+  NO_HC128: 1
+  NO_MD4: 1
+  NO_OLD_TLS: 1
+  NO_PSK: 1
+  NO_PWDBASED: 1
+  NO_RC4: 1
+  NO_RABBIT: 1
+  NO_STDIO_FILESYSTEM: 1
+  NO_WOLFSSL_DIR: 1
+  NO_DH: 1
+  WOLFSSL_STATIC_RSA: 1
+  WOLFSSL_IAR_ARM: 1
+  NDEBUG: 1
+  HAVE_CERTIFICATE_STATUS_REQUEST: 1
+  CUSTOM_RAND_GENERATE_SEED: os_get_random
+
 filesystem:
   - fs
 config_schema:
 libs:
 
+init_after:
+  - ethernet
+  - wifi
+
 tags:
   - c
-  - docs:misc:Empty
+  - homekit
 
 manifest_version: 2017-09-29
+
+# Temporary, while root manifest change propagates (2018/03/29).
+libs:
+  - origin: https://github.com/mongoose-os-libs/core
+  - origin: https://github.com/mongoose-os-libs/mongoose
