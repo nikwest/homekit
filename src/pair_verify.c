@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "chacha20_poly1305.h"
+#include "hap_chacha20_poly1305.h"
 #include "concat.h"
-#include "curve25519.h"
-#include "ed25519.h"
+#include "hap_curve25519.h"
+#include "hap_ed25519.h"
 #include "hap_internal.h"
 #include "hkdf.h"
 #include "iosdevice.h"
@@ -16,7 +16,7 @@
 struct pair_verify {
     char* acc_id;
     void* iosdevices;
-    
+
     struct {
         uint8_t* public;
         uint8_t* private;
@@ -24,7 +24,7 @@ struct pair_verify {
     uint8_t session_key[CURVE25519_SECRET_LENGTH];
 };
 
-static const char* header_fmt = 
+static const char* header_fmt =
     "HTTP/1.1 200 OK\r\n"
     "Content-Length: %d\r\n"
     "Content-Type: application/pairing+tlv8\r\n"
@@ -38,7 +38,7 @@ static void _subtlv_free(uint8_t* subtlv)
 
 static uint8_t _state_get(uint8_t* device_msg, int device_msg_length)
 {
-    struct tlv* state_tlv = tlv_decode((uint8_t*)device_msg, device_msg_length, 
+    struct tlv* state_tlv = tlv_decode((uint8_t*)device_msg, device_msg_length,
             HAP_TLV_TYPE_STATE);
     if (state_tlv == NULL) {
         printf("tlv_decode failed. type:%d\n", HAP_TLV_TYPE_STATE);
@@ -51,8 +51,8 @@ static uint8_t _state_get(uint8_t* device_msg, int device_msg_length)
     return state;
 }
 
-static int _verify_m2(struct pair_verify* pv, 
-        uint8_t* device_msg, int device_msg_length, 
+static int _verify_m2(struct pair_verify* pv,
+        uint8_t* device_msg, int device_msg_length,
         uint8_t** acc_msg, int* acc_msg_length)
 {
     uint8_t acc_curve_public_key[CURVE25519_KEY_LENGTH] = {0,};
@@ -62,7 +62,7 @@ static int _verify_m2(struct pair_verify* pv,
         return -1;
     }
 
-    struct tlv* ios_device_curve_key = tlv_decode((uint8_t*)device_msg, 
+    struct tlv* ios_device_curve_key = tlv_decode((uint8_t*)device_msg,
             device_msg_length, HAP_TLV_TYPE_PUBLICKEY);
     if (!ios_device_curve_key) {
         printf("tlv_decode failed. type:%d\n", HAP_TLV_TYPE_PUBLICKEY);
@@ -87,7 +87,7 @@ static int _verify_m2(struct pair_verify* pv,
 
     int acc_signature_length = ED25519_SIGN_LENGTH;
     uint8_t acc_signature[ED25519_SIGN_LENGTH] = {0,};
-    ed25519_sign(pv->keys.public, pv->keys.private, 
+    ed25519_sign(pv->keys.public, pv->keys.private,
             acc_info, acc_info_len,
             acc_signature, &acc_signature_length);
 
@@ -130,12 +130,12 @@ static int _verify_m2(struct pair_verify* pv,
     _subtlv_free(acc_subtlv);
 
     memcpy(pv->session_key, session_key, CURVE25519_SECRET_LENGTH);
-    
+
     return 0;
 }
 
-static int _verify_m4(struct pair_verify* pv, 
-        uint8_t* device_msg, int device_msg_length, 
+static int _verify_m4(struct pair_verify* pv,
+        uint8_t* device_msg, int device_msg_length,
         uint8_t** acc_msg, int* acc_msg_length)
 {
     struct tlv* encrypted_tlv = tlv_decode((uint8_t*)device_msg, device_msg_length,
@@ -153,7 +153,7 @@ static int _verify_m4(struct pair_verify* pv,
     tlv_decoded_item_free(encrypted_tlv);
 
     int subtlv_length = strlen((char*)subtlv);;
-    struct tlv* ios_device_pairng_id = tlv_decode(subtlv, subtlv_length, 
+    struct tlv* ios_device_pairng_id = tlv_decode(subtlv, subtlv_length,
             HAP_TLV_TYPE_IDENTIFIER);
     if (ios_device_pairng_id == NULL) {
         printf("tlv_devoce HAP_TLV_TYPE_IDENTIFIER failed\n");
@@ -161,7 +161,7 @@ static int _verify_m4(struct pair_verify* pv,
         return pair_error(HAP_TLV_ERROR_UNKNOWN, acc_msg, acc_msg_length);
     }
 
-    struct tlv* ios_device_signature = tlv_decode(subtlv, subtlv_length, 
+    struct tlv* ios_device_signature = tlv_decode(subtlv, subtlv_length,
             HAP_TLV_TYPE_SIGNATURE);
     if (ios_device_signature == NULL) {
         printf("tlv_devoce HAP_TLV_TYPE_SIGNATURE failed\n");
@@ -191,8 +191,8 @@ static int _verify_m4(struct pair_verify* pv,
     return 0;
 }
 
-int pair_verify_do(void* _pv, const char* req_body, int req_body_len, 
-        char** res_header, int* res_header_len, char** res_body, int* res_body_len, 
+int pair_verify_do(void* _pv, const char* req_body, int req_body_len,
+        char** res_header, int* res_header_len, char** res_body, int* res_body_len,
         bool* verified, char* session_key)
 {
     struct pair_verify* pv = _pv;
@@ -201,10 +201,10 @@ int pair_verify_do(void* _pv, const char* req_body, int req_body_len,
     int error = 0;
     switch (state) {
     case 0x01:
-        error = _verify_m2(pv, (uint8_t*)req_body, req_body_len, (uint8_t**)res_body, res_body_len); 
+        error = _verify_m2(pv, (uint8_t*)req_body, req_body_len, (uint8_t**)res_body, res_body_len);
         break;
     case 0x03:
-        error = _verify_m4(pv, (uint8_t*)req_body, req_body_len, (uint8_t**)res_body, res_body_len); 
+        error = _verify_m4(pv, (uint8_t*)req_body, req_body_len, (uint8_t**)res_body, res_body_len);
         if (error == 0) {
             *verified = true;
             memcpy(session_key, pv->session_key, CURVE25519_SECRET_LENGTH);
@@ -256,4 +256,3 @@ void pair_verify_cleanup(void* _pv)
 
     free(pv);
 }
-

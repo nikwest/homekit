@@ -6,8 +6,8 @@
 #include <cJSON.h>
 
 #include "advertise.h"
-#include "chacha20_poly1305.h"
-#include "ed25519.h"
+#include "hap_chacha20_poly1305.h"
+#include "hap_ed25519.h"
 #include "hap.h"
 #include "hap_internal.h"
 #include "httpd.h"

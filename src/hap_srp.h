@@ -1,5 +1,5 @@
-#ifndef _SRP_H_
-#define _SRP_H_
+#ifndef _HAP_SRP_H_
+#define _HAP_SRP_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,4 +29,4 @@ void srp_cleanup(void* instance);
 }
 #endif
 
-#endif //#ifndef _SRP_H_
+#endif //#ifndef _HAP_SRP_H_

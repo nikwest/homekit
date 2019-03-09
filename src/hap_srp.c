@@ -3,7 +3,7 @@
 #include <wolfssl/wolfcrypt/srp.h>
 #include <wolfssl/wolfcrypt/sha512.h>
 
-#include "srp.h"
+#include "hap_srp.h"
 
 //#define DEBUG
 
@@ -144,8 +144,8 @@ int srp_client_key_set(void* instance, uint8_t* client_public_key)
         return -1;
     }
 
-    int err = wc_SrpComputeKey(&srp->wolfcrypt, 
-            client_public_key, SRP_PUBLIC_KEY_LENGTH, 
+    int err = wc_SrpComputeKey(&srp->wolfcrypt,
+            client_public_key, SRP_PUBLIC_KEY_LENGTH,
             srp->B, SRP_PUBLIC_KEY_LENGTH);
     if (err < 0) {
         ESP_LOGE(TAG, "wc_SrpComputeKey failed. err:%d\n", err);

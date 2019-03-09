@@ -8,7 +8,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "ed25519.h"
+#include "hap_ed25519.h"
 
 #define IOSDEVICE_PER_ACCESSORY_MAX  8
 #define IOSDEVICE_ID_LEN       36

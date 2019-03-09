@@ -7,8 +7,8 @@
 #include <esp_log.h>
 
 #include "advertise.h"
-#include "chacha20_poly1305.h"
-#include "ed25519.h"
+#include "hap_chacha20_poly1305.h"
+#include "hap_ed25519.h"
 #include "hap.h"
 #include "hap_internal.h"
 #include "accessories.h"
@@ -57,7 +57,7 @@ static int _decrypt(struct hap_connection* hc, char* encrypted, int len, char* d
     nonce[4] = hc->decrypt_count % 256;
     nonce[5] = hc->decrypt_count++ / 256;
 
-    if (chacha20_poly1305_decrypt_with_nonce(nonce, hc->decrypt_key, ptr, AAD_LENGTH, 
+    if (chacha20_poly1305_decrypt_with_nonce(nonce, hc->decrypt_key, ptr, AAD_LENGTH,
                 ptr+AAD_LENGTH, decrypted_len + CHACHA20_POLY1305_AUTH_TAG_LENGTH, (uint8_t*)decrypted) < 0) {
         ESP_LOGE(TAG, "chacha20_poly1305_decrypt_with_nonce failed");
         return 0;
@@ -68,7 +68,7 @@ static int _decrypt(struct hap_connection* hc, char* encrypted, int len, char* d
     return decrypted_len;;
 }
 
-static void _encrypted_msg_recv(void* connection, struct mg_connection* nc, char* msg, int len) 
+static void _encrypted_msg_recv(void* connection, struct mg_connection* nc, char* msg, int len)
 {
     char* decrypted = calloc(1, len);
     if (decrypted == NULL) {
@@ -80,7 +80,7 @@ static void _encrypted_msg_recv(void* connection, struct mg_connection* nc, char
     uint8_t* saveptr = NULL;
     int decrypted_len = 0;
 
-    for (decrypted_len = _decrypt(hc, msg, len, decrypted, &saveptr); decrypted_len; 
+    for (decrypted_len = _decrypt(hc, msg, len, decrypted, &saveptr); decrypted_len;
          decrypted_len = _decrypt(hc, msg, len, decrypted, &saveptr)) {
         _plain_msg_recv(connection, nc, decrypted, decrypted_len);
     }
@@ -123,7 +123,7 @@ static char* _encrypt(struct hap_connection* hc, char* msg, int len, int* encryp
     return encrypted;
 }
 
-static void _encrypt_free(char* msg) 
+static void _encrypt_free(char* msg)
 {
     if (msg)
         free(msg);
@@ -348,7 +348,7 @@ static void _hap_connection_accept(void* accessory, struct mg_connection* nc)
     xSemaphoreGive(_hap_desc->mutex);
 }
 
-static void _accessory_ltk_load(struct hap_accessory* a) 
+static void _accessory_ltk_load(struct hap_accessory* a)
 {
     char acc_id_compact[13] = {0,};
     acc_id_compact[0] = a->id[0];
@@ -418,7 +418,7 @@ void* hap_accessory_add(void* acc_instance)
 }
 
 void hap_service_and_characteristics_add(void* acc_instance, void* acc_obj,
-        enum hap_service_type type, struct hap_characteristic* cs, int nr_cs) 
+        enum hap_service_type type, struct hap_characteristic* cs, int nr_cs)
 {
     hap_acc_service_and_characteristics_add(acc_obj, type, cs, nr_cs);
 }

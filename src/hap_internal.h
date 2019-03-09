@@ -9,8 +9,8 @@ extern "C" {
 
 #include <cJSON.h>
 
-#include "curve25519.h"
-#include "ed25519.h"
+#include "hap_curve25519.h"
+#include "hap_ed25519.h"
 #include "hap.h"
 #include "hkdf.h"
 #include "FreeRTOS.h"

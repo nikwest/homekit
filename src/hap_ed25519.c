@@ -4,7 +4,7 @@
 #include <wolfssl/wolfcrypt/ed25519.h>
 #include <wolfssl/wolfcrypt/curve25519.h>
 
-#include "ed25519.h"
+#include "hap_ed25519.h"
 
 #define TAG "ED25519"
 
@@ -61,13 +61,13 @@ int ed25519_verify(uint8_t* public_key, int key_len, uint8_t* signature, int sig
     }
 
     int verified = 0;
-    err = wc_ed25519_verify_msg(signature, signature_len, msg, msg_len, 
+    err = wc_ed25519_verify_msg(signature, signature_len, msg, msg_len,
             &verified, &ed25519_key);
     if (err < 0) {
         ESP_LOGE(TAG, "wc_ed25519_verify_msg. err:%d\n", err);
         return err;
     }
-    
+
     if (verified == 0) {
         ESP_LOGE(TAG, "verification failed. err:%d\n", err);
         return -1;
@@ -84,13 +84,13 @@ int ed25519_sign(uint8_t public_key[], uint8_t private_key[], uint8_t* in, int i
         ESP_LOGE(TAG, "wc_ed25519_init. err:%d\n", err);
         return err;
     }
-    
+
     err = wc_ed25519_import_private_key(private_key, ED25519_KEY_SIZE, private_key + ED25519_KEY_SIZE, ED25519_KEY_SIZE, &ed25519_key);
     if (err < 0) {
         ESP_LOGE(TAG, "wc_ed25519_import_private_key. err:%d\n", err);
         return err;
     }
-    
+
     err = wc_ed25519_sign_msg(in, in_len, signatured, (word32*)signatured_len, &ed25519_key);
     if (err < 0) {
         ESP_LOGE(TAG, "wc_ed25519_sign_msg. err:%d\n", err);

@@ -5,13 +5,16 @@ version: 1.0
 platforms: [esp32]
 
 sources:
-  - src
-  - wolfssl/src
   - wolfssl/wolfcrypt/src
+  - wolfssl/src
+  - src
 
 includes:
   - include
   - wolfssl
+
+build_vars:
+  ESP_IDF_EXTRA_COMPONENTS: "${build_vars.ESP_IDF_EXTRA_COMPONENTS} console json mdns"
 
 cflags:
   - "-fstrict-volatile-bitfields"

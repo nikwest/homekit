@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ed25519.h"
+#include "hap_ed25519.h"
 #include "iosdevice.h"
 #include "nvs.h"
 
