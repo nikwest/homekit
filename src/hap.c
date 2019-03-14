@@ -453,7 +453,13 @@ void* hap_accessory_register(char* name, char* id, char* pincode, char* vendor, 
     a->iosdevices = iosdevice_pairings_init(a->id);
     a->advertise = advertise_accessory_add(a->name, a->id, a->vendor, a->port, a->config_number, a->category,
                                            ADVERTISE_ACCESSORY_STATE_NOT_PAIRED);
-    a->bind = httpd_bind(port, a);
+
+    struct httpd_ops httpd_ops = {
+        .accept = _hap_connection_accept,
+        .close = _hap_connection_close,
+        .recv = _msg_recv,
+    };
+    httpd_register(&httpd_ops, a);
     _hap_desc->nr_accessory = 1;
 
     return a;
@@ -480,12 +486,4 @@ void hap_init(void)
         return;
 
     vSemaphoreCreateBinary(_hap_desc->mutex);
-
-    struct httpd_ops httpd_ops = {
-        .accept = _hap_connection_accept,
-        .close = _hap_connection_close,
-        .recv = _msg_recv,
-    };
-
-    httpd_init(&httpd_ops);
 }

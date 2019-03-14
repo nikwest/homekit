@@ -1,23 +1,10 @@
 
-#include <stdio.h>
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-#include "mongoose.h"
 #include "httpd.h"
+#include "mgos_http_server.h"
+
 
 static struct httpd_ops _ops;
-static struct mg_mgr _mgr;
-static SemaphoreHandle_t _httpd_mutex;
-
-static void _httpd_task(void* arg) {
-    while (1) {
-        xSemaphoreTake(_httpd_mutex, 0);
-        mg_mgr_poll(&_mgr, 1000);
-        xSemaphoreGive(_httpd_mutex);
-    }
-}
 
 static void mg_ev_handler(struct mg_connection* nc, int ev, void *p, void* user_data) {
     switch (ev)     {
@@ -61,36 +48,7 @@ static void mg_ev_handler(struct mg_connection* nc, int ev, void *p, void* user_
     }
 }
 
-void* httpd_bind(int port, void* user_data) {
-    if (port <= 0)
-        return NULL;
-
-    struct mg_connection* nc = NULL;
-    char port_string[8] = {0,};
-    #if MG_ENABLE_IPV6
-        sprintf(port_string, "[::]:%d", port);
-    #else
-        sprintf(port_string, "%d", port);
-    #endif
-
-    xSemaphoreTake(_httpd_mutex, 0);
-    nc = mg_bind(&_mgr, port_string, mg_ev_handler, user_data);
-    if (nc == NULL) {
-        printf("[ERR] mg_bind failed]n");
-        goto err_mg_bind;
-    }
-
-    mg_set_protocol_http_websocket(nc);
-
-err_mg_bind:
-    xSemaphoreGive(_httpd_mutex);
-    return nc;
-}
-
-void httpd_init(struct httpd_ops* ops) {
-#define HTTPD_STACK (1024*8)
-    mg_mgr_init(&_mgr, NULL);
-    _httpd_mutex = xSemaphoreCreateMutex();
+void httpd_register(struct httpd_ops* ops, void* user_data) {
     _ops = *ops;
-    xTaskCreate(_httpd_task, "httpd_task", HTTPD_STACK, NULL, 5, NULL);
+    mgos_register_http_endpoint("/", mg_ev_handler, user_data);
 }

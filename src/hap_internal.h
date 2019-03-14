@@ -31,7 +31,7 @@ struct hap_accessory {
     uint32_t config_number;
 
     void* advertise;
-    void* bind;
+    //void* bind;
     void* iosdevices;
 
     int last_aid;

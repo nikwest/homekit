@@ -33,6 +33,8 @@ cflags:
   - "-Wno-error=implicit-function-declaration"
 
 cdefs:
+  LWIP_IPV6: 1
+  MG_ENABLE_IPV6: 1
   SIZEOF_LONG_LONG: 8
   SMALL_SESSION_CACHE: 1
   WOLFSSL_SMALL_STACK: 1
@@ -89,3 +91,4 @@ manifest_version: 2017-09-29
 libs:
   - origin: https://github.com/mongoose-os-libs/core
   - origin: https://github.com/mongoose-os-libs/mongoose
+  - origin: https://github.com/mongoose-os-libs/http-server

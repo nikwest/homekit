@@ -13,6 +13,8 @@ struct httpd_ops {
     void (*recv)(void* user_data, struct mg_connection* nc, char* msg, int length);
 };
 
+void httpd_register(struct httpd_ops* ops, void* user_data);
+
 void* httpd_bind(int port, void* user_data);
 void httpd_init(struct httpd_ops* ops);
 

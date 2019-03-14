@@ -56,7 +56,8 @@ static void _service_txt_set(struct advertiser* adv) {
         service_txt_ci
     };
 #endif
-    mdns_service_txt_set(HAP_SERVICE, HAP_PROTO, hap_service_txt, ARRAY_SIZE(hap_service_txt));
+    ESP_ERROR_CHECK(mdns_service_txt_set(HAP_SERVICE, HAP_PROTO, hap_service_txt, ARRAY_SIZE(hap_service_txt)));
+    printf("dns-sd set service text.\n");
 }
 
 void advertise_accessory_state_set(void* adv_instance, enum advertise_accessory_state state) {
@@ -94,10 +95,10 @@ void* advertise_accessory_add(char* name, char* id, char* host, int port, uint32
     adv->category = category;
     adv->state = state;
 
-    mdns_init();
-    mdns_hostname_set(host);
-    mdns_instance_name_set(name);
-    mdns_service_add(name, HAP_SERVICE, HAP_PROTO, port, NULL, 0);
+    ESP_ERROR_CHECK(mdns_init());
+    ESP_ERROR_CHECK(mdns_hostname_set(host));
+    ESP_ERROR_CHECK(mdns_instance_name_set(name));
+    ESP_ERROR_CHECK( mdns_service_add(name, HAP_SERVICE, HAP_PROTO, port, NULL, 0));
     _service_txt_set(adv);
 
     return adv;
